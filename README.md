@@ -18,5 +18,4 @@ Each day can contain one or more independent projects with their own README, pac
 
 ## Adding More Work
 
-To add future work, create a new folder such as `Day-8/` and place one or more projects inside it. Dependency folders such as `node_modules/`, build outputs, logs, and local `.env` files are ignored from the root repository.
 
