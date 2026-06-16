@@ -1,0 +1,352 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --font-sans: 'Outfit', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Premium Warm/Sepia Light Theme */
+  --bg-app: #fcfaf7;
+  --bg-sidebar: #f5f0e8;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --bg-active: #eae3d5;
+  --bg-hover: #f1ebd8;
+  --text-main: #2d2621;
+  --text-muted: #6e645e;
+  --text-accent: #b05c3c; /* Terracotta */
+  --border-color: #e6dfd3;
+  --shadow-sm: 0 2px 4px rgba(45, 38, 33, 0.04);
+  --shadow-md: 0 4px 16px rgba(45, 38, 33, 0.06);
+  --shadow-lg: 0 10px 30px rgba(45, 38, 33, 0.08);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --scrollbar-thumb: #d7cdbd;
+  --scrollbar-track: transparent;
+  
+  /* Cost Palette */
+  --cost-red: #d9534f;
+  --cost-green: #5cb85c;
+  --cost-bg-red: #fdf2f2;
+  --cost-bg-green: #f2fdf2;
+}
+
+[data-theme='dark'] {
+  /* Premium Minimalist Dark Theme */
+  --bg-app: #121212;
+  --bg-sidebar: #1a1a1a;
+  --bg-card: #222222;
+  --bg-input: #2a2a2a;
+  --bg-active: #333333;
+  --bg-hover: #2d2d2d;
+  --text-main: #e5e5e5;
+  --text-muted: #a0a0a0;
+  --text-accent: #f08c62;
+  --border-color: #2e2e2e;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --scrollbar-thumb: #3e3e3e;
+  --scrollbar-track: transparent;
+  
+  /* Cost Palette Dark */
+  --cost-red: #ec6f6b;
+  --cost-green: #6bc46b;
+  --cost-bg-red: #2d1e1e;
+  --cost-bg-green: #1e2d1e;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.15s ease;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Notebook paper pattern background for the preview panel */
+.notebook-paper {
+  background-color: var(--bg-card);
+  background-image: 
+    linear-gradient(var(--border-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Chat bubble styling with nice gradients */
+.bubble {
+  max-width: 85%;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  line-height: 1.5;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+.bubble.user {
+  background-color: var(--text-accent);
+  color: #ffffff;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+.bubble.assistant {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Citation items inside the chat assistant */
+.citation-container {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-sidebar);
+  border-left: 3px solid var(--text-accent);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.citation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: var(--bg-active);
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.75rem;
+  margin-right: 6px;
+  cursor: pointer;
+}
+.citation-badge:hover {
+  background-color: var(--bg-hover);
+}
+
+/* Code block markdown formatting */
+pre {
+  background-color: var(--bg-sidebar);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  border: 1px solid var(--border-color);
+  margin: 10px 0;
+}
+code {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background-color: var(--bg-hover);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Pulse animation for loading indicators */
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+.pulse {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Custom UI Layout classes */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.sidebar {
+  width: 320px;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.main-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
+  background-color: var(--bg-app);
+}
+
+@media (max-width: 1000px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  .preview-panel {
+    display: none !important;
+  }
+}
+
+.preview-panel {
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-card);
+}
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.panel-header {
+  height: 64px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background-color: var(--bg-card);
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* Button & interactive components */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  outline: none;
+  font-family: var(--font-sans);
+}
+.btn-primary {
+  background-color: var(--text-accent);
+  color: #ffffff;
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+.btn-secondary {
+  background-color: var(--bg-input);
+  color: var(--text-main);
+  border-color: var(--border-color);
+}
+.btn-secondary:hover {
+  background-color: var(--bg-hover);
+}
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.text-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-input);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  outline: none;
+  font-size: 0.95rem;
+}
+.text-input:focus {
+  border-color: var(--text-accent);
+}
+
+/* Cost Analysis Comparison styles */
+.cost-card {
+  padding: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  margin-bottom: 12px;
+  font-size: 0.88rem;
+}
+.cost-header {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.cost-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+.cost-value {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+.cost-value.red {
+  color: var(--cost-red);
+}
+.cost-value.green {
+  color: var(--cost-green);
+}
+.savings-banner {
+  margin-top: 8px;
+  padding: 6px;
+  background-color: var(--cost-bg-green);
+  border: 1px solid var(--cost-green);
+  color: var(--cost-green);
+  font-weight: 600;
+  text-align: center;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
