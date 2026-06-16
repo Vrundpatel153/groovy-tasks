@@ -1,4 +1,4 @@
-# Groovy Tasks
+# Groovy Tasks - 30 Days
 
 A root collection of daily coding tasks and projects.
 
@@ -16,6 +16,6 @@ Projects are grouped by day:
 
 Each day can contain one or more independent projects with their own README, package files, and local setup instructions.
 
-## Adding More Work
+## Adding More Work ...
 
 
