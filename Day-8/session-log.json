@@ -1,0 +1,14 @@
+{
+  "Gemini": {
+    "input": 2,
+    "output": 10
+  },
+  "Cohere": {
+    "input": 0,
+    "output": 0
+  },
+  "Groq": {
+    "input": 0,
+    "output": 0
+  }
+}
