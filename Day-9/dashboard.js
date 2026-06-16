@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { PRICING } = require("./api-utils");
 
 const LOG_FILE = path.join(__dirname, "usage-log.csv");
 
@@ -29,35 +30,83 @@ function parseCsvLine(line) {
   return cells;
 }
 
-if (!fs.existsSync(LOG_FILE)) {
-  console.log("No usage-log.csv found.");
-  process.exit(0);
+function getSummary() {
+  if (!fs.existsSync(LOG_FILE)) {
+    return {
+      calls: 0,
+      inputTokens: 0,
+      outputTokens: 0,
+      cachedTokens: 0,
+      totalCost: 0,
+      cacheSavings: 0,
+    };
+  }
+
+  const content = fs.readFileSync(LOG_FILE, "utf8").trim();
+  if (!content) {
+    return {
+      calls: 0,
+      inputTokens: 0,
+      outputTokens: 0,
+      cachedTokens: 0,
+      totalCost: 0,
+      cacheSavings: 0,
+    };
+  }
+
+  const lines = content.split(/\r?\n/).slice(1).filter(Boolean);
+  let inputTokens = 0;
+  let outputTokens = 0;
+  let cachedTokens = 0;
+  let totalCost = 0;
+
+  for (const line of lines) {
+    const row = parseCsvLine(line);
+    inputTokens += Number(row[3]) || 0;
+    outputTokens += Number(row[4]) || 0;
+    cachedTokens += Number(row[5]) || 0;
+    totalCost += Number(row[6]) || 0;
+  }
+
+  const fullPriceInputCost = inputTokens * PRICING.inputPerMillion / 1_000_000;
+  const cachedInputCost =
+    (inputTokens - cachedTokens) * PRICING.inputPerMillion / 1_000_000 +
+    cachedTokens * PRICING.cachedPerMillion / 1_000_000;
+  const cacheSavings = fullPriceInputCost > 0
+    ? ((fullPriceInputCost - cachedInputCost) / fullPriceInputCost) * 100
+    : 0;
+
+  return {
+    calls: lines.length,
+    inputTokens,
+    outputTokens,
+    cachedTokens,
+    totalCost,
+    cacheSavings,
+  };
 }
 
-const lines = fs.readFileSync(LOG_FILE, "utf8").trim().split(/\r?\n/).slice(1);
-let inputTokens = 0;
-let outputTokens = 0;
-let cachedTokens = 0;
-let totalCost = 0;
+function printDashboard() {
+  const summary = getSummary();
+  if (summary.calls === 0) {
+    console.log("No usage-log.csv data found yet. Run cache-test or explain-codebase first.");
+    return summary;
+  }
 
-for (const line of lines) {
-  if (!line) continue;
-  const row = parseCsvLine(line);
-  inputTokens += Number(row[3]) || 0;
-  outputTokens += Number(row[4]) || 0;
-  cachedTokens += Number(row[5]) || 0;
-  totalCost += Number(row[6]) || 0;
+  console.log("");
+  console.log("Usage Dashboard");
+  console.log("---------------");
+  console.log(`Total Calls: ${summary.calls}`);
+  console.log(`Input Tokens: ${summary.inputTokens}`);
+  console.log(`Output Tokens: ${summary.outputTokens}`);
+  console.log(`Cached Tokens: ${summary.cachedTokens}`);
+  console.log(`Total Cost: ${summary.totalCost.toFixed(8)}`);
+  console.log(`Cache Savings %: ${summary.cacheSavings.toFixed(2)}`);
+  return summary;
 }
 
-const fullPriceInputCost = inputTokens * 1.0 / 1_000_000;
-const cachedInputCost = (inputTokens - cachedTokens) * 1.0 / 1_000_000 + cachedTokens * 0.25 / 1_000_000;
-const cacheSavings = fullPriceInputCost > 0
-  ? ((fullPriceInputCost - cachedInputCost) / fullPriceInputCost) * 100
-  : 0;
+if (require.main === module) {
+  printDashboard();
+}
 
-console.log(`Total Calls: ${lines.filter(Boolean).length}`);
-console.log(`Input Tokens: ${inputTokens}`);
-console.log(`Output Tokens: ${outputTokens}`);
-console.log(`Cached Tokens: ${cachedTokens}`);
-console.log(`Total Cost: ${totalCost.toFixed(8)}`);
-console.log(`Cache Savings %: ${cacheSavings.toFixed(2)}`);
+module.exports = { getSummary, printDashboard };

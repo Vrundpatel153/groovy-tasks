@@ -2,37 +2,39 @@
 
 Node.js CLI scripts that use the Groq OpenAI-compatible API with the `moonshotai/kimi-k2-instruct` model.
 
+The easiest path is:
+
+```powershell
+npm install
+npm start
+```
+
 ## Files
 
 - `cache-test.js` - makes exactly two sequential Groq calls with the same long prompt prefix and prints usage, cached-token fields, and cost difference.
 - `explain-codebase.js` - accepts a folder path, reads code files up to about 40K characters, and asks Groq to explain the codebase structure.
 - `usage-logger.js` - shared CSV logger that appends usage rows to `usage-log.csv`.
 - `dashboard.js` - reads `usage-log.csv` and prints total calls, tokens, cost, and cache savings percentage.
+- `index.js` - interactive menu for explaining a folder, running the cache test, and viewing the dashboard.
 
 ## Setup
 
-Install the OpenAI SDK:
+Install dependencies:
 
 ```powershell
-npm install openai
+npm install
 ```
 
-Set your Groq key before running the API scripts:
-
-```powershell
-$env:GROQ_API_KEY="your_groq_api_key"
-```
-
-Or put it in `.env` and run with Node's env-file support:
-
-```powershell
-node --env-file=.env cache-test.js
-```
-
-The `.env` file should contain:
+Add your Groq key to `.env`:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
+```
+
+You can also set it in PowerShell:
+
+```powershell
+$env:GROQ_API_KEY="your_groq_api_key"
 ```
 
 ## Test
@@ -40,10 +42,7 @@ GROQ_API_KEY=your_groq_api_key
 Run syntax checks without making API calls:
 
 ```powershell
-node --check cache-test.js
-node --check explain-codebase.js
-node --check usage-logger.js
-node --check dashboard.js
+npm test
 ```
 
 Confirm the missing-key guard exits cleanly:
@@ -55,20 +54,24 @@ node explain-codebase.js .
 
 ## Run
 
-Run the cache test:
+Start the interactive CLI:
 
 ```powershell
-node cache-test.js
+npm start
 ```
 
-Explain a folder:
+Useful menu choices:
+
+- `1` explains this repository.
+- `2` asks for a folder path and explains that folder.
+- `3` runs the two-call prompt cache test.
+- `4` shows the CSV usage dashboard.
+- `5` explains this repository, then shows the updated dashboard.
+
+Direct commands still work:
 
 ```powershell
-node explain-codebase.js ../Day-8
-```
-
-View usage totals after one or more API calls:
-
-```powershell
-node dashboard.js
+npm run cache
+npm run explain
+npm run dashboard
 ```

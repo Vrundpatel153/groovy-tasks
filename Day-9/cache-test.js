@@ -1,20 +1,6 @@
-const OpenAI = require("openai");
 const { logUsage } = require("./usage-logger");
-
-const MODEL = "moonshotai/kimi-k2-instruct";
-const INPUT_PER_MILLION = 1.0;
-const OUTPUT_PER_MILLION = 3.0;
-const CACHED_PER_MILLION = 0.25;
-
-if (!process.env.GROQ_API_KEY) {
-  console.error("Missing GROQ_API_KEY.");
-  process.exit(1);
-}
-
-const client = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: "https://api.groq.com/openai/v1",
-});
+const { requireGroqKey } = require("./load-env");
+const { MODEL, createGroqClient, usageOf, costOf } = require("./api-utils");
 
 const systemPrompt = `
 You are reviewing a fictional engineering handbook. Treat the following policy text as the stable reference prefix for every answer. Keep it in mind exactly and answer only the small question that follows.
@@ -35,31 +21,9 @@ Data principles:
 Measure what matters, but collect only what is needed. Prefer events that describe user intent and system outcomes. Keep raw identifiers out of analytics when a stable anonymous key will do. Retention should have a reason and an owner. Backfills should be restartable. Derived data should identify its source and freshness. Reports should state the question they answer. Metrics should avoid vanity and expose tradeoffs. Privacy reviews should happen before launch.
 `.repeat(3);
 
-function usageOf(response) {
-  const usage = response.usage || {};
-  return {
-    inputTokens: usage.prompt_tokens || usage.input_tokens || 0,
-    outputTokens: usage.completion_tokens || usage.output_tokens || 0,
-    cachedTokens:
-      usage.prompt_tokens_details?.cached_tokens ||
-      usage.input_tokens_details?.cached_tokens ||
-      usage.cached_tokens ||
-      0,
-    raw: usage,
-  };
-}
-
-function costOf(usage) {
-  const uncachedInput = Math.max(usage.inputTokens - usage.cachedTokens, 0);
-  return (
-    (uncachedInput * INPUT_PER_MILLION +
-      usage.cachedTokens * CACHED_PER_MILLION +
-      usage.outputTokens * OUTPUT_PER_MILLION) /
-    1_000_000
-  );
-}
-
-async function main() {
+async function runCacheTest() {
+  requireGroqKey();
+  const client = createGroqClient();
   const request = {
     model: MODEL,
     messages: [
@@ -85,7 +49,11 @@ async function main() {
   console.log("Cost difference:", (firstCost - secondCost).toFixed(8));
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exit(1);
-});
+if (require.main === module) {
+  runCacheTest().catch((error) => {
+    console.error(error.message);
+    process.exit(1);
+  });
+}
+
+module.exports = { runCacheTest };

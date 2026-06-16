@@ -1,0 +1,17 @@
+{
+  "name": "day-9-groq-usage-cli",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Groq-powered Node.js CLI for cache testing, codebase explanation, and usage dashboards.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "cache": "node cache-test.js",
+    "explain": "node explain-codebase.js ..",
+    "dashboard": "node dashboard.js",
+    "test": "node --check index.js && node --check cache-test.js && node --check explain-codebase.js && node --check usage-logger.js && node --check dashboard.js && node --check load-env.js && node --check api-utils.js"
+  },
+  "dependencies": {
+    "openai": "^6.8.1"
+  }
+}

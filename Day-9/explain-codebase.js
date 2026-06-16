@@ -1,39 +1,14 @@
 const fs = require("fs");
 const path = require("path");
-const OpenAI = require("openai");
 const { logUsage } = require("./usage-logger");
+const { requireGroqKey } = require("./load-env");
+const { MODEL, createGroqClient, usageOf, costOf } = require("./api-utils");
 
-const MODEL = "moonshotai/kimi-k2-instruct";
-const INPUT_PER_MILLION = 1.0;
-const OUTPUT_PER_MILLION = 3.0;
-const CACHED_PER_MILLION = 0.25;
 const MAX_CHARS = 40_000;
 const CODE_EXTENSIONS = new Set([
   ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".json", ".html", ".css", ".scss",
   ".py", ".rb", ".go", ".rs", ".java", ".cs", ".php", ".sh", ".ps1", ".md", ".yml", ".yaml",
 ]);
-
-if (!process.env.GROQ_API_KEY) {
-  console.error("Missing GROQ_API_KEY.");
-  process.exit(1);
-}
-
-const folderArg = process.argv[2];
-if (!folderArg) {
-  console.error("Usage: node explain-codebase.js <folder-path>");
-  process.exit(1);
-}
-
-const root = path.resolve(folderArg);
-if (!fs.existsSync(root) || !fs.statSync(root).isDirectory()) {
-  console.error("Folder path not found.");
-  process.exit(1);
-}
-
-const client = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: "https://api.groq.com/openai/v1",
-});
 
 function isBinary(filePath) {
   const buffer = fs.readFileSync(filePath);
@@ -53,32 +28,10 @@ function collectFiles(dir, files = []) {
   return files;
 }
 
-function usageOf(response) {
-  const usage = response.usage || {};
-  return {
-    inputTokens: usage.prompt_tokens || usage.input_tokens || 0,
-    outputTokens: usage.completion_tokens || usage.output_tokens || 0,
-    cachedTokens:
-      usage.prompt_tokens_details?.cached_tokens ||
-      usage.input_tokens_details?.cached_tokens ||
-      usage.cached_tokens ||
-      0,
-  };
-}
-
-function costOf(usage) {
-  const uncachedInput = Math.max(usage.inputTokens - usage.cachedTokens, 0);
-  return (
-    (uncachedInput * INPUT_PER_MILLION +
-      usage.cachedTokens * CACHED_PER_MILLION +
-      usage.outputTokens * OUTPUT_PER_MILLION) /
-    1_000_000
-  );
-}
-
-async function main() {
+function buildCodebaseInput(root) {
   let combined = "";
   let skipped = 0;
+  let included = 0;
 
   for (const file of collectFiles(root)) {
     if (isBinary(file)) continue;
@@ -89,16 +42,31 @@ async function main() {
       continue;
     }
     combined += block;
+    included += 1;
   }
 
+  return { combined, included, skipped };
+}
+
+async function explainCodebase(folderPath, options = {}) {
+  requireGroqKey();
+  const root = path.resolve(folderPath);
+  if (!fs.existsSync(root) || !fs.statSync(root).isDirectory()) {
+    throw new Error("Folder path not found.");
+  }
+
+  const { combined, included, skipped } = buildCodebaseInput(root);
+  console.log(`Reading: ${root}`);
+  console.log(`Included files: ${included}`);
   if (skipped > 0) {
     console.warn(`Warning: skipped ${skipped} files after ~10K token cap.`);
   }
 
+  const client = createGroqClient();
   const response = await client.chat.completions.create({
     model: MODEL,
     messages: [
-      { role: "system", content: "Explain the structure and purpose of the provided codebase clearly and concisely." },
+      { role: "system", content: "Explain the structure, purpose, entry points, and important files in the provided codebase. Keep it practical for a developer who wants to run or modify it." },
       { role: "user", content: combined || "No readable code files found." },
     ],
   });
@@ -106,10 +74,27 @@ async function main() {
   const usage = usageOf(response);
   const cost = costOf(usage);
   logUsage("groq", MODEL, usage.inputTokens, usage.outputTokens, usage.cachedTokens, cost);
-  console.log(response.choices[0]?.message?.content || "");
+  const result = response.choices[0]?.message?.content || "";
+  if (options.print !== false) {
+    console.log("");
+    console.log(result);
+    console.log("");
+    console.log(`Logged usage. Cost: ${cost.toFixed(8)}`);
+  }
+  return { result, usage, cost };
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exit(1);
-});
+if (require.main === module) {
+  const folderArg = process.argv[2];
+  if (!folderArg) {
+    console.error("Usage: node explain-codebase.js <folder-path>");
+    process.exit(1);
+  }
+
+  explainCodebase(folderArg).catch((error) => {
+    console.error(error.message);
+    process.exit(1);
+  });
+}
+
+module.exports = { explainCodebase };
