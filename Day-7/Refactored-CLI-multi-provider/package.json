@@ -1,0 +1,13 @@
+{
+  "name": "day-7-multi-provider-cli-chatbot",
+  "version": "1.0.0",
+  "description": "A multi-turn CLI chatbot with Anthropic, OpenAI, and Groq providers.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --env-file=.env index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.2",
+    "openai": "^6.42.0"
+  }
+}

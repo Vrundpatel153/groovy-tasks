@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS students (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(160) UNIQUE NOT NULL,
+  phone VARCHAR(40) NOT NULL,
+  course VARCHAR(120) NOT NULL,
+  year INT NOT NULL,
+  enrollment_date DATE NOT NULL,
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);

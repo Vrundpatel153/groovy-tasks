@@ -1,0 +1,532 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Patrick+Hand&display=swap');
+
+:root {
+  --cream: #fbf4e4;
+  --paper: #fffdf6;
+  --ink: #2f332c;
+  --muted: #747062;
+  --line: #d9e3df;
+  --sage: #b7d7bd;
+  --sage-dark: #52765e;
+  --blue: #bed3df;
+  --yellow: #f4d88a;
+  --rose: #e8aaa1;
+  --shadow: 0 18px 45px rgba(79, 68, 45, 0.14);
+  --radius: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    linear-gradient(90deg, rgba(190, 211, 223, 0.18) 1px, transparent 1px) 0 0 / 34px 34px,
+    linear-gradient(var(--cream), #f7ecd2);
+  color: var(--ink);
+  font-family: 'Nunito', system-ui, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px clamp(18px, 4vw, 54px);
+  background: rgba(251, 244, 228, 0.9);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(121, 101, 58, 0.16);
+}
+
+.brand,
+.nav-links,
+.nav-links a,
+.button,
+.profile-facts p,
+.card-lines p,
+.note-preview {
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  gap: 10px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--yellow);
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.08);
+}
+
+.nav-links {
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 13px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.nav-links a.active,
+.nav-links a:hover {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 8px 20px rgba(79, 68, 45, 0.1);
+}
+
+.nav-links .nav-cta {
+  background: var(--sage);
+  color: #263e2c;
+}
+
+.page-wrap {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 34px 0 64px;
+}
+
+.page-grid,
+.form-layout {
+  display: grid;
+  gap: 24px;
+}
+
+.page-title h1,
+.profile-head h1,
+.section-heading h2,
+.notes-section h2 {
+  margin: 0;
+  font-family: 'Patrick Hand', cursive;
+  letter-spacing: 0;
+}
+
+.page-title h1,
+.profile-head h1 {
+  font-size: clamp(2.8rem, 8vw, 5rem);
+  line-height: 0.95;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--sage-dark);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.stats-grid,
+.student-grid,
+.dashboard-columns,
+.form-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.stats-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.stat-card,
+.paper-panel,
+.student-card,
+.profile-sheet,
+.paper-form {
+  position: relative;
+  border: 1px solid rgba(121, 101, 58, 0.16);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.stat-card {
+  display: grid;
+  gap: 8px;
+  padding: 22px;
+  min-height: 146px;
+}
+
+.stat-card span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.stat-card strong {
+  font-size: 2.5rem;
+}
+
+.sage {
+  background: #e9f3e8;
+}
+
+.blue {
+  background: #e9f2f6;
+}
+
+.yellow {
+  background: #fff2c5;
+}
+
+.dashboard-columns {
+  grid-template-columns: 1.1fr 0.9fr;
+}
+
+.paper-panel,
+.student-card,
+.profile-sheet,
+.paper-form {
+  background:
+    repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(122, 164, 185, 0.22) 32px),
+    var(--paper);
+}
+
+.paper-panel {
+  padding: 24px;
+}
+
+.section-heading,
+.card-heading,
+.profile-head,
+.action-row,
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.section-heading h2,
+.notes-section h2 {
+  font-size: 2rem;
+}
+
+.course-list,
+.recent-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.course-row,
+.recent-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.recent-row {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.recent-row small,
+.empty-copy,
+.note-preview {
+  color: var(--muted);
+}
+
+.filter-bar {
+  display: grid;
+  grid-template-columns: 1fr 220px 160px;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--radius);
+  background: rgba(255, 253, 246, 0.78);
+  border: 1px solid rgba(121, 101, 58, 0.14);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-box,
+.filter-bar select,
+.paper-form input,
+.paper-form textarea {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid rgba(121, 101, 58, 0.18);
+  border-radius: var(--radius);
+  background: #fffefa;
+  padding: 0 13px;
+  color: var(--ink);
+}
+
+.search-box input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+
+.student-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.student-card {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  overflow: hidden;
+}
+
+.student-card::before,
+.profile-sheet::before,
+.paper-form::before,
+.paper-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 18px;
+  width: 2px;
+  background: rgba(232, 170, 161, 0.55);
+}
+
+.card-pin {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--rose);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+}
+
+.card-heading {
+  align-items: flex-start;
+}
+
+.card-heading h3 {
+  margin: 0;
+  padding-right: 24px;
+  font-size: 1.35rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  white-space: nowrap;
+  border-radius: 999px;
+  background: var(--blue);
+  padding: 5px 10px;
+  color: #325365;
+  font-size: 0.85rem;
+  font-weight: 900;
+}
+
+.card-lines {
+  display: grid;
+  gap: 9px;
+}
+
+.card-lines p,
+.profile-facts p,
+.note-preview {
+  gap: 9px;
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.text-link {
+  width: fit-content;
+  color: var(--sage-dark);
+  font-weight: 900;
+}
+
+.detail-layout {
+  display: grid;
+}
+
+.profile-sheet,
+.paper-form {
+  padding: clamp(22px, 4vw, 38px);
+}
+
+.profile-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 28px 0;
+}
+
+.profile-facts p {
+  padding: 14px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.notes-section {
+  padding: 22px;
+  border-radius: var(--radius);
+  background: rgba(244, 216, 138, 0.24);
+}
+
+.notes-section p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.button {
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  color: var(--ink);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.primary {
+  background: var(--sage);
+}
+
+.secondary {
+  background: var(--blue);
+}
+
+.danger {
+  background: var(--rose);
+}
+
+.paper-form {
+  display: grid;
+  gap: 20px;
+}
+
+.form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.paper-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.paper-form textarea {
+  min-height: 140px;
+  padding-top: 12px;
+  resize: vertical;
+}
+
+.paper-form small,
+.form-alert,
+.error-state {
+  color: #9a3328;
+}
+
+.form-alert {
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: rgba(232, 170, 161, 0.25);
+  font-weight: 800;
+}
+
+.state-panel {
+  min-height: 170px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-weight: 900;
+}
+
+@media (max-width: 900px) {
+  .navbar,
+  .profile-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .stats-grid,
+  .dashboard-columns,
+  .student-grid,
+  .profile-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-bar,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .page-wrap {
+    width: min(100% - 22px, 1180px);
+    padding-top: 22px;
+  }
+
+  .nav-links {
+    width: 100%;
+  }
+
+  .nav-links a {
+    flex: 1 1 140px;
+    justify-content: center;
+  }
+
+  .section-heading,
+  .card-heading,
+  .action-row,
+  .form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .button {
+    width: 100%;
+  }
+}

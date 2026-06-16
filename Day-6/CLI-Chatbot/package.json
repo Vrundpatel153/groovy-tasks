@@ -1,0 +1,12 @@
+{
+  "name": "day-6-groq-cli-chatbot",
+  "version": "1.0.0",
+  "description": "A multi-turn CLI chatbot using the Groq SDK.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --env-file=.env index.js"
+  },
+  "dependencies": {
+    "groq-sdk": "^0.32.0"
+  }
+}
