@@ -8,6 +8,7 @@
     "start": "node index.js",
     "cache": "node cache-test.js",
     "explain": "node explain-codebase.js ..",
+    "demo": "node explain-codebase.js demo-codebase",
     "dashboard": "node dashboard.js",
     "test": "node --check index.js && node --check cache-test.js && node --check explain-codebase.js && node --check usage-logger.js && node --check dashboard.js && node --check load-env.js && node --check api-utils.js"
   },

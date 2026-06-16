@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { PRICING } = require("./api-utils");
+const { pricingFor } = require("./api-utils");
 
 const LOG_FILE = path.join(__dirname, "usage-log.csv");
 
@@ -59,19 +59,27 @@ function getSummary() {
   let outputTokens = 0;
   let cachedTokens = 0;
   let totalCost = 0;
+  let fullPriceInputCost = 0;
+  let cachedInputCost = 0;
 
   for (const line of lines) {
     const row = parseCsvLine(line);
-    inputTokens += Number(row[3]) || 0;
-    outputTokens += Number(row[4]) || 0;
-    cachedTokens += Number(row[5]) || 0;
+    const model = row[2];
+    const rowInputTokens = Number(row[3]) || 0;
+    const rowOutputTokens = Number(row[4]) || 0;
+    const rowCachedTokens = Number(row[5]) || 0;
+    const pricing = pricingFor(model);
+
+    inputTokens += rowInputTokens;
+    outputTokens += rowOutputTokens;
+    cachedTokens += rowCachedTokens;
     totalCost += Number(row[6]) || 0;
+    fullPriceInputCost += rowInputTokens * pricing.inputPerMillion / 1_000_000;
+    cachedInputCost +=
+      (rowInputTokens - rowCachedTokens) * pricing.inputPerMillion / 1_000_000 +
+      rowCachedTokens * pricing.cachedPerMillion / 1_000_000;
   }
 
-  const fullPriceInputCost = inputTokens * PRICING.inputPerMillion / 1_000_000;
-  const cachedInputCost =
-    (inputTokens - cachedTokens) * PRICING.inputPerMillion / 1_000_000 +
-    cachedTokens * PRICING.cachedPerMillion / 1_000_000;
   const cacheSavings = fullPriceInputCost > 0
     ? ((fullPriceInputCost - cachedInputCost) / fullPriceInputCost) * 100
     : 0;

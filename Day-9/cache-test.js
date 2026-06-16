@@ -1,5 +1,8 @@
 const { logUsage } = require("./usage-logger");
-const { requireGroqKey } = require("./load-env");
+const { loadEnv, requireGroqKey } = require("./load-env");
+
+loadEnv();
+
 const { MODEL, createGroqClient, usageOf, costOf } = require("./api-utils");
 
 const systemPrompt = `
@@ -35,14 +38,14 @@ async function runCacheTest() {
 
   const first = await client.chat.completions.create(request);
   const firstUsage = usageOf(first);
-  const firstCost = costOf(firstUsage);
+  const firstCost = costOf(firstUsage, MODEL);
   logUsage("groq", MODEL, firstUsage.inputTokens, firstUsage.outputTokens, firstUsage.cachedTokens, firstCost);
   console.log("Call 1 usage:", JSON.stringify(firstUsage.raw, null, 2));
   console.log("Call 1 cost:", firstCost.toFixed(8));
 
   const second = await client.chat.completions.create(request);
   const secondUsage = usageOf(second);
-  const secondCost = costOf(secondUsage);
+  const secondCost = costOf(secondUsage, MODEL);
   logUsage("groq", MODEL, secondUsage.inputTokens, secondUsage.outputTokens, secondUsage.cachedTokens, secondCost);
   console.log("Call 2 usage:", JSON.stringify(secondUsage.raw, null, 2));
   console.log("Call 2 cost:", secondCost.toFixed(8));

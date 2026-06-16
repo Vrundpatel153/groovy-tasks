@@ -2,13 +2,15 @@ const path = require("path");
 const readline = require("readline/promises");
 const { stdin: input, stdout: output } = require("process");
 const { loadEnv } = require("./load-env");
+
+loadEnv();
+
 const { runCacheTest } = require("./cache-test");
 const { explainCodebase } = require("./explain-codebase");
 const { printDashboard } = require("./dashboard");
 
-loadEnv();
-
 const repoRoot = path.resolve(__dirname, "..");
+const demoRoot = path.resolve(__dirname, "demo-codebase");
 
 function showMenu() {
   console.log("");
@@ -19,6 +21,7 @@ function showMenu() {
   console.log("3. Run prompt cache test");
   console.log("4. Show usage dashboard");
   console.log("5. Explain this repository, then show dashboard");
+  console.log("6. Explain demo folder, then show dashboard");
   console.log("0. Exit");
 }
 
@@ -43,8 +46,11 @@ async function main() {
       } else if (choice === "5") {
         await explainCodebase(repoRoot);
         printDashboard();
+      } else if (choice === "6") {
+        await explainCodebase(demoRoot);
+        printDashboard();
       } else {
-        console.log("Choose 0, 1, 2, 3, 4, or 5.");
+        console.log("Choose 0, 1, 2, 3, 4, 5, or 6.");
       }
     }
   } finally {

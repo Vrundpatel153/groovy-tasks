@@ -1,10 +1,13 @@
 const fs = require("fs");
 const path = require("path");
 const { logUsage } = require("./usage-logger");
-const { requireGroqKey } = require("./load-env");
+const { loadEnv, requireGroqKey } = require("./load-env");
+
+loadEnv();
+
 const { MODEL, createGroqClient, usageOf, costOf } = require("./api-utils");
 
-const MAX_CHARS = 40_000;
+const MAX_CHARS = Number(process.env.CODEBASE_MAX_CHARS || 24_000);
 const CODE_EXTENSIONS = new Set([
   ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".json", ".html", ".css", ".scss",
   ".py", ".rb", ".go", ".rs", ".java", ".cs", ".php", ".sh", ".ps1", ".md", ".yml", ".yaml",
@@ -59,12 +62,13 @@ async function explainCodebase(folderPath, options = {}) {
   console.log(`Reading: ${root}`);
   console.log(`Included files: ${included}`);
   if (skipped > 0) {
-    console.warn(`Warning: skipped ${skipped} files after ~10K token cap.`);
+    console.warn(`Warning: skipped ${skipped} files after the ${MAX_CHARS.toLocaleString()} character cap.`);
   }
 
   const client = createGroqClient();
   const response = await client.chat.completions.create({
     model: MODEL,
+    max_tokens: 900,
     messages: [
       { role: "system", content: "Explain the structure, purpose, entry points, and important files in the provided codebase. Keep it practical for a developer who wants to run or modify it." },
       { role: "user", content: combined || "No readable code files found." },
@@ -72,7 +76,7 @@ async function explainCodebase(folderPath, options = {}) {
   });
 
   const usage = usageOf(response);
-  const cost = costOf(usage);
+  const cost = costOf(usage, MODEL);
   logUsage("groq", MODEL, usage.inputTokens, usage.outputTokens, usage.cachedTokens, cost);
   const result = response.choices[0]?.message?.content || "";
   if (options.print !== false) {

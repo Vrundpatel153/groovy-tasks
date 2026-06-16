@@ -1,0 +1,2 @@
+timestamp,provider,model,inputTokens,outputTokens,cachedTokens,cost
+2026-06-16T11:02:22.473Z,groq,llama-3.1-8b-instant,278,433,0,0.00004854
