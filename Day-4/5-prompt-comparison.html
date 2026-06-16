@@ -229,7 +229,7 @@
         <h1>AI Chat Comparison</h1>
         <p class="subtitle">
           A clean, button-driven HTML view for comparing the five prompts across ChatGPT, Claude, and Gemini.
-          The ChatGPT responses are filled in from your pasted chats. Claude and Gemini panels are ready for their text.
+          All three model panels now follow the same prompt-by-prompt card layout for direct comparison.
         </p>
         <div class="stats">
           <div class="stat"><strong>3 model buttons</strong><span>Switch between ChatGPT, Claude, and Gemini views.</span></div>
@@ -695,26 +695,253 @@ useEffect(() => {
       <div class="panel-head">
         <div class="panel-title">
           <h2>Claude</h2>
-          <p>Insert Claude’s responses here if you want a full side-by-side comparison.</p>
+          <p>Filled from `claude.txt` in the same 5-prompt layout.</p>
         </div>
-        <div class="badge">Placeholder</div>
+        <div class="badge">5 prompt sections</div>
       </div>
-      <div class="empty">No Claude chat text was included in the pasted content. This panel is ready for you to populate with Claude’s version of the same five prompts.</div>
+      <div class="prompt-grid">
+        <article class="prompt-card">
+          <div class="prompt-top">
+            <h3>1) Explain SQL vs NoSQL to a junior developer using a spreadsheet analogy</h3>
+            <span class="tag">Database comparison</span>
+          </div>
+          <pre>Explain the difference between SQL and NoSQL databases to a junior developer who has only used spreadsheets before. Use a real-world analogy.
+
+The Analogy: From Spreadsheets to Databases
+Since you know spreadsheets, imagine them as the starting point. A spreadsheet is basically SQL.
+
+SQL databases are like Excel spreadsheets on steroids:
+
+Think of SQL as a super-organized filing system. Every table (like a sheet) has columns with strict names and types — Name, Age, Email. If you add a new person, they must fit into those exact columns. No variations. It's rigid, predictable, and perfect for things like a company payroll system where everyone has the same information (salary, start date, department). The database enforces the rules — you can't skip a required column.
+
+NoSQL databases are like a folder of documents:
+
+NoSQL is more like having a folder full of sticky notes or text files. Each "document" (a record) can have whatever information you want. One note might say "Name: Alice, Hobby: Tennis, Age: 28." Another might say "Name: Bob, Job Title: Manager, Languages Spoken: English, Spanish." They don't have to match. If Alice doesn't have a job title, that's fine — just leave it out. This flexibility is great when you're storing things that naturally vary, like social media posts (some have photos, some have videos, some are just text).
+
+Key Differences at a Glance
+Aspect	SQL	NoSQL
+Structure	Rigid schema (fixed columns)	Flexible (any fields)
+Scaling	Vertical (bigger server)	Horizontal (more servers)
+Relationships	Tables join together	Documents stand alone
+Speed	Slower for huge amounts of data	Faster for massive scale
+Learning curve	Complex queries (SQL language)	Simpler (often JSON-like)</pre>
+        </article>
+        <article class="prompt-card">
+          <div class="prompt-top">
+            <h3>2) Refactor average function with edge cases</h3>
+            <span class="tag">JavaScript</span>
+          </div>
+          <pre>Refactor this function to be more readable and handle edge cases (empty array, non-number inputs):
+function avg(arr) {
+  let sum = 0;
+  for (let i = 0; i < arr.length; i++) {
+    sum += arr[i];
+  }
+  return sum / arr.length;
+}
+
+The Problems with the Original
+Your original function has 4 major issues:
+- Empty array -> Returns Infinity (dividing 0 by 0)
+- Non-numbers -> Returns NaN (can't add strings to numbers)
+- No validation -> Crashes if you pass null or a non-array
+- Generic naming -> arr doesn't say what type of data it contains
+
+Recommended practical version:
+function getAverage(numbers) {
+  if (!Array.isArray(numbers) || numbers.length === 0) {
+    return null;
+  }
+
+  const validNumbers = numbers.filter(
+    item => typeof item === 'number' && !Number.isNaN(item)
+  );
+
+  if (validNumbers.length === 0) {
+    return null;
+  }
+
+  const sum = validNumbers.reduce((acc, num) => acc + num, 0);
+  return sum / validNumbers.length;
+}</pre>
+        </article>
+        <article class="prompt-card">
+          <div class="prompt-top">
+            <h3>3) Explain prompt engineering</h3>
+            <span class="tag">Prompt design</span>
+          </div>
+          <pre>explain prompt engineering
+
+I'll explain prompt engineering in a way that connects to things you already understand.
+
+Comprehensive guide to prompt engineering with examples and techniques
+Now let me create a visual guide showing the key concepts:</pre>
+        </article>
+        <article class="prompt-card">
+          <div class="prompt-top">
+            <h3>4) Refactor a Node.js Express middleware rate limiter</h3>
+            <span class="tag">Node.js</span>
+          </div>
+          <pre>Write a Node.js Express middleware function that rate-limits requests to 100 per 15 minutes per IP address, without using any external libraries. Add comments explaining the logic.
+
+Key features in the Claude response:
+- In-memory tracking per IP
+- Cleanup to avoid memory leaks
+- X-RateLimit headers + Retry-After
+- 429 Too Many Requests response
+
+Includes:
+- createRateLimiter middleware pattern
+- example Express app integration
+- utility helpers like reset/check status</pre>
+        </article>
+        <article class="prompt-card">
+          <div class="prompt-top">
+            <h3>5) Explain why `useEffect` causes an infinite render loop</h3>
+            <span class="tag">React</span>
+          </div>
+          <pre>This React useEffect hook causes an infinite render loop:
+useEffect(() => {
+  setCount(count + 1);
+}, [count]);
+Explain why this happens and show the corrected version.
+
+Why it loops:
+1. Render with count
+2. Effect runs and updates count
+3. State change triggers re-render
+4. Dependency [count] changed
+5. Effect runs again forever
+
+Correct patterns shown:
+- Use empty dependency array when running once on mount
+- Use functional update: setCount(prev => prev + 1) with []
+- If watching count, update different state inside effect</pre>
+        </article>
+      </div>
     </section>
 
     <section id="gemini" class="panel" role="tabpanel" aria-hidden="true">
       <div class="panel-head">
         <div class="panel-title">
           <h2>Gemini</h2>
-          <p>Insert Gemini’s responses here if you want a full side-by-side comparison.</p>
+          <p>Filled from `gemini.txt` in the same 5-prompt layout.</p>
         </div>
-        <div class="badge">Placeholder</div>
+        <div class="badge">5 / 5 prompts included</div>
       </div>
-      <div class="empty">No Gemini chat text was included in the pasted content. This panel is ready for you to populate with Gemini’s version of the same five prompts.</div>
+      <div class="prompt-grid">
+        <article class="prompt-card">
+          <div class="prompt-top">
+            <h3>1) Explain SQL vs NoSQL to a junior developer using a spreadsheet analogy</h3>
+            <span class="tag">Database comparison</span>
+          </div>
+          <pre>Explain the difference between SQL and NoSQL databases to a junior developer who has only used spreadsheets before. Use a real-world analogy.
+
+Welcome to the world of databases! Since you are already comfortable with spreadsheets like Excel or Google Sheets, you actually have a massive head start. Both SQL and NoSQL databases exist to do exactly what spreadsheets do: store, organize, and retrieve data.
+
+The main difference lies in how they structure that data and how flexible they are.
+
+SQL (Structured Query Language):
+- Data in strict tables (rows/columns)
+- Fixed schema
+- Great relationships/joins
+- Examples: PostgreSQL, MySQL, SQLite
+
+NoSQL:
+- Flexible document/key-value style data
+- Dynamic schema
+- Great horizontal scaling
+- Examples: MongoDB, DynamoDB, Redis</pre>
+        </article>
+        <article class="prompt-card">
+          <div class="prompt-top">
+            <h3>2) Refactor average function with edge cases</h3>
+            <span class="tag">JavaScript</span>
+          </div>
+          <pre>Refactor this function to be more readable and handle edge cases (empty array, non-number inputs):
+
+function avg(arr) {
+  let sum = 0;
+  for (let i = 0; i &lt; arr.length; i++) {
+    sum += arr[i];
+  }
+  return sum / arr.length;
+}
+
+Refactored response:
+function avg(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) {
+    return 0;
+  }
+
+  const validNumbers = arr.filter(num => typeof num === 'number' && !isNaN(num));
+  if (validNumbers.length === 0) {
+    return 0;
+  }
+
+  const totalSum = validNumbers.reduce((accumulator, current) => accumulator + current, 0);
+  return totalSum / validNumbers.length;
+}</pre>
+        </article>
+        <article class="prompt-card">
+          <div class="prompt-top">
+            <h3>3) Explain prompt engineering</h3>
+            <span class="tag">Prompt design</span>
+          </div>
+          <pre>Prompt engineering is the practice of structuring, designing, and refining text inputs (prompts) to get accurate, relevant, and useful AI responses.
+
+Core components:
+- Role/persona
+- Context
+- Task/instruction
+- Output format
+
+Key techniques:
+1. Few-shot prompting
+2. Chain-of-thought prompting
+3. Role-based prompting
+4. Retrieval-augmented generation (RAG)</pre>
+        </article>
+        <article class="prompt-card">
+          <div class="prompt-top">
+            <h3>4) Refactor a Node.js Express middleware rate limiter</h3>
+            <span class="tag">Node.js</span>
+          </div>
+          <pre>Write a Node.js Express middleware function that rate-limits requests to 100 per 15 minutes per IP address, without using any external libraries. Add comments explaining the logic.
+
+Gemini response includes:
+- Map-based in-memory store
+- 100 requests / 15-minute window
+- Standard X-RateLimit headers
+- Retry-After and 429 response
+- Example Express usage and trust proxy note</pre>
+        </article>
+        <article class="prompt-card">
+          <div class="prompt-top">
+            <h3>5) Explain why `useEffect` causes an infinite render loop</h3>
+            <span class="tag">React</span>
+          </div>
+          <pre>This React useEffect hook causes an infinite render loop:
+
+useEffect(() => {
+  setCount(count + 1);
+}, [count]);
+
+Reason:
+- The effect depends on `count`
+- It updates `count` inside the effect
+- Updating `count` triggers re-render
+- Re-render triggers effect again
+
+Fixes shown:
+- Run once with `[]` and functional state update if needed
+- Or keep `[count]` but do not call `setCount` inside that same effect</pre>
+        </article>
+      </div>
     </section>
 
     <div class="footer-note">
-      Tip: you can duplicate the ChatGPT structure inside the Claude and Gemini panels to turn this into a true three-way comparison.
+      Tip: each model uses the same five prompt headings, so you can compare responses card-by-card.
     </div>
   </div>
 
