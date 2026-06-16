@@ -1,6 +1,7 @@
 # Day 8 - Multi-Provider CLI Chatbot v2
 
 A robust multi-turn Node.js CLI chatbot that integrates with Groq, Gemini, and Cohere providers. It features real-time token streaming, exponential backoff retries, and token usage reporting.
+![alt text](image-1.png)
 ![alt text](image.png)
 
 ## Features

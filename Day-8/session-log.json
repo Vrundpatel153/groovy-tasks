@@ -1,7 +1,7 @@
 {
   "Gemini": {
-    "input": 2,
-    "output": 10
+    "input": 75,
+    "output": 60
   },
   "Cohere": {
     "input": 0,

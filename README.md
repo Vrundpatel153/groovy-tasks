@@ -13,6 +13,8 @@ Projects are grouped by day:
 - `Day-5/`
 - `Day-6/`
 - `Day-7/`
+- `Day-8/`
+- `Day-9/`
 
 Each day can contain one or more independent projects with their own README, package files, and local setup instructions.
 
