@@ -1,7 +1,7 @@
 # Ask My Notes - Web Application
 
 A minimalist, journal-style web application that allows users to upload PDF notes and ask natural language questions about them. The app leverages Groq's high-speed inference (using `llama-3.3-70b-versatile` with a large 128k token context window) to answer questions directly from the note text, without requiring a vector database.
-<video controls src="20260616-1036-48.7808059.mp4" title="Title"></video>
+<video controls src="20260616-1050-04.9095426.mp4" title="Title"></video>
 ## Architecture
 
 - **Frontend**: React (Vite setup) featuring:
