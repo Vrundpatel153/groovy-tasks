@@ -1,0 +1,24 @@
+{
+  "name": "day-13-tool-agent",
+  "version": "1.0.0",
+  "description": "Tool-Using Agent with Simple Web UI",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "openai": "^4.52.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.3.1"
+  }
+}

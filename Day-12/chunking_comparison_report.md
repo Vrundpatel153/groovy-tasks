@@ -1,6 +1,6 @@
 # RAG Chunking Strategy & Cohere Reranker Comparison Report
 
-**Generated on**: 16/6/2026, 6:31:57 pm
+**Generated on**: 17/6/2026, 10:05:12 am
 **Dataset**: 2,000-word Retrieval-Augmented Generation (RAG) In-Depth Guide
 **Evaluation queries**: 10 handcrafted queries with unique ground-truth passages
 
@@ -23,10 +23,10 @@ Below is the comparative performance matrix of all 4 chunking strategies, pre- a
 
 | Chunking Strategy | Chunks | Avg Size (Words) | Hit Rate @ 1 (Embed) | Hit Rate @ 1 (Rerank) | Hit Rate @ 3 (Embed) | Hit Rate @ 3 (Rerank) | MRR @ 3 (Embed) | MRR @ 3 (Rerank) | Latency (ms) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Fixed-Size Chunking** | 12 | 100 | 100.0% | 90.0% | 100.0% | 100.0% | 1.000 | 0.950 | 396 ms |
-| **Sliding Window Chunking** | 18 | 149 | 100.0% | 100.0% | 100.0% | 100.0% | 1.000 | 1.000 | 720 ms |
-| **Semantic Chunking** | 13 | 75 | 70.0% | 100.0% | 100.0% | 100.0% | 0.850 | 1.000 | 569 ms |
-| **Hierarchical Chunking** | 28 | 54 | 100.0% | 100.0% | 100.0% | 100.0% | 1.000 | 1.000 | 460 ms |
+| **Fixed-Size Chunking** | 12 | 100 | 100.0% | 90.0% | 100.0% | 100.0% | 1.000 | 0.950 | 545 ms |
+| **Sliding Window Chunking** | 18 | 149 | 100.0% | 100.0% | 100.0% | 100.0% | 1.000 | 1.000 | 530 ms |
+| **Semantic Chunking** | 13 | 75 | 70.0% | 100.0% | 100.0% | 100.0% | 0.850 | 1.000 | 503 ms |
+| **Hierarchical Chunking** | 28 | 54 | 100.0% | 100.0% | 100.0% | 100.0% | 1.000 | 1.000 | 597 ms |
 
 *Note: Latency includes network calls to Cohere Embed (for queries) and Cohere Rerank.*
 

@@ -12,6 +12,7 @@ Projects are grouped by day:
 | [Day-4](Day-4/) | [Day-5](Day-5/) | [Day-6](Day-6/) |
 | [Day-7](Day-7/) | [Day-8](Day-8/) | [Day-9](Day-9/) |
 | [Day-10](Day-10/) | [Day-11](Day-11/) | [Day-12](Day-12/) |
+| [Day-13](Day-13/) | | |
 
 Each day can contain one or more independent projects with their own README, package files, and local setup instructions.
 
