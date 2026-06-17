@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAG Chunking & Retrieval Evaluation Sandbox</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="An interactive playground to test and evaluate RAG chunking strategies—fixed-size, sliding window, semantic, and hierarchical—and measure retrieval quality using Cohere Reranker.">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Styling -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon"><i data-lucide="layers"></i></div>
+        <div>
+          <h1>RAG Chunking & Retrieval Sandbox</h1>
+          <p class="subtitle">Evaluate Fixed-Size, Sliding Window, Semantic & Hierarchical Chunking + Cohere Reranking</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <span class="badge badge-cohere">
+          <i data-lucide="zap" class="icon-spin"></i> Cohere API Connected
+        </span>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+      
+      <!-- Left Sidebar: Controls -->
+      <aside class="sidebar">
+        <div class="glass-card">
+          <div class="sidebar-section">
+            <h3><i data-lucide="file-text"></i> Dataset Document</h3>
+            <div class="doc-stats">
+              <div class="stat-item">
+                <span class="stat-label">Words</span>
+                <span class="stat-val" id="doc-words">-</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Characters</span>
+                <span class="stat-val" id="doc-chars">-</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Sentences</span>
+                <span class="stat-val" id="doc-sentences">-</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-full" id="btn-view-doc">
+              <i data-lucide="eye"></i> View Raw Document
+            </button>
+          </div>
+
+          <div class="sidebar-section divider">
+            <h3><i data-lucide="sliders"></i> Chunking Strategy</h3>
+            
+            <div class="tabs-buttons compact" role="tablist">
+              <button class="tab-btn active" data-strategy="fixed">Fixed</button>
+              <button class="tab-btn" data-strategy="sliding">Sliding</button>
+              <button class="tab-btn" data-strategy="semantic">Semantic</button>
+              <button class="tab-btn" data-strategy="hierarchical">Hierarchical</button>
+            </div>
+
+            <!-- Strategy Descriptions -->
+            <div class="strategy-desc" id="strategy-desc">
+              <strong>Fixed-Size Chunks</strong>: Splits text into equal word blocks with a fixed overlap. Computationally fast, but ignores natural sentence boundaries.
+            </div>
+
+            <!-- Configuration Parameters -->
+            <div class="params-container">
+              <!-- Fixed Size Params -->
+              <div class="param-group active" data-strategy-param="fixed">
+                <div class="slider-container">
+                  <div class="slider-label">
+                    <span>Chunk Size (words)</span>
+                    <span class="slider-value" id="val-fixed-size">100</span>
+                  </div>
+                  <input type="range" min="30" max="300" step="10" value="100" class="slider" id="param-fixed-size">
+                </div>
+                <div class="slider-container">
+                  <div class="slider-label">
+                    <span>Overlap (words)</span>
+                    <span class="slider-value" id="val-fixed-overlap">20</span>
+                  </div>
+                  <input type="range" min="0" max="100" step="5" value="20" class="slider" id="param-fixed-overlap">
+                </div>
+              </div>
+
+              <!-- Sliding Window Params -->
+              <div class="param-group" data-strategy-param="sliding">
+                <div class="slider-container">
+                  <div class="slider-label">
+                    <span>Window Size (words)</span>
+                    <span class="slider-value" id="val-sliding-window">150</span>
+                  </div>
+                  <input type="range" min="50" max="400" step="10" value="150" class="slider" id="param-sliding-window">
+                </div>
+                <div class="slider-container">
+                  <div class="slider-label">
+                    <span>Step Size (words)</span>
+                    <span class="slider-value" id="val-sliding-step">50</span>
+                  </div>
+                  <input type="range" min="10" max="200" step="5" value="50" class="slider" id="param-sliding-step">
+                </div>
+              </div>
+
+              <!-- Semantic Params -->
+              <div class="param-group" data-strategy-param="semantic">
+                <div class="slider-container">
+                  <div class="slider-label">
+                    <span>Split Percentile Threshold</span>
+                    <span class="slider-value" id="val-semantic-threshold">25</span>
+                  </div>
+                  <input type="range" min="5" max="80" step="5" value="25" class="slider" id="param-semantic-threshold">
+                </div>
+                <p class="param-help">Splits text into sentences. Breaks boundary where sentence similarity is in the bottom N%.</p>
+              </div>
+
+              <!-- Hierarchical Params -->
+              <div class="param-group" data-strategy-param="hierarchical">
+                <div class="slider-container">
+                  <div class="slider-label">
+                    <span>Parent Size (words)</span>
+                    <span class="slider-value" id="val-parent-size">250</span>
+                  </div>
+                  <input type="range" min="150" max="500" step="25" value="250" class="slider" id="param-parent-size">
+                </div>
+                <div class="slider-container">
+                  <div class="slider-label">
+                    <span>Parent Overlap (words)</span>
+                    <span class="slider-value" id="val-parent-overlap">50</span>
+                  </div>
+                  <input type="range" min="10" max="150" step="10" value="50" class="slider" id="param-parent-overlap">
+                </div>
+                <div class="slider-container">
+                  <div class="slider-label">
+                    <span>Child Size (words)</span>
+                    <span class="slider-value" id="val-child-size">60</span>
+                  </div>
+                  <input type="range" min="20" max="120" step="5" value="60" class="slider" id="param-child-size">
+                </div>
+                <div class="slider-container">
+                  <div class="slider-label">
+                    <span>Child Overlap (words)</span>
+                    <span class="slider-value" id="val-child-overlap">15</span>
+                  </div>
+                  <input type="range" min="0" max="40" step="5" value="15" class="slider" id="param-child-overlap">
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-full margin-top" id="btn-generate-chunks">
+              <i data-lucide="play-circle"></i> Generate & Preview Chunks
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Area: Content tabs -->
+      <main class="main-content">
+        <!-- Main Navigation Tabs -->
+        <nav class="main-nav-tabs">
+          <button class="nav-tab active" data-tab="visualizer">
+            <i data-lucide="binoculars"></i> Chunk Visualizer
+          </button>
+          <button class="nav-tab" data-tab="search">
+            <i data-lucide="search"></i> Search & Reranking Playground
+          </button>
+          <button class="nav-tab" data-tab="evaluator">
+            <i data-lucide="bar-chart-2"></i> Evaluation Dashboard
+          </button>
+        </nav>
+
+        <!-- Tab Contents -->
+        <div class="tab-content-container">
+          
+          <!-- Tab 1: Chunk Boundary Visualizer -->
+          <div class="tab-pane active" id="tab-visualizer">
+            <div class="glass-card flex-column">
+              <div class="pane-header">
+                <div>
+                  <h2>Chunk Boundary Visualizer</h2>
+                  <p>Visualize how the selected strategy segments the text into independent chunks</p>
+                </div>
+                <div class="stats-badge">
+                  Generated Chunks: <strong id="val-total-chunks">-</strong>
+                </div>
+              </div>
+
+              <!-- Chunk Visual Display -->
+              <div class="visualizer-content" id="visualizer-content">
+                <div class="empty-state">
+                  <i data-lucide="click-to-play" class="large-icon"></i>
+                  <h3>Generate Chunks</h3>
+                  <p>Configure parameters in the sidebar and click "Generate & Preview Chunks" to visualize chunking boundaries.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Semantic Search & Reranking Playground -->
+          <div class="tab-pane" id="tab-search">
+            <div class="glass-card">
+              <div class="pane-header">
+                <div>
+                  <h2>Search & Reranking Playground</h2>
+                  <p>Type a custom query to evaluate the impact of Cohere Reranking on first-pass retrieval</p>
+                </div>
+              </div>
+
+              <div class="search-input-area">
+                <div class="input-wrapper">
+                  <i data-lucide="search" class="search-input-icon"></i>
+                  <input type="text" id="search-query-input" placeholder="e.g., Who introduced the concept of Retrieval-Augmented Generation (RAG)?">
+                </div>
+                <button class="btn btn-primary" id="btn-run-search">
+                  <i data-lucide="zap"></i> Search
+                </button>
+              </div>
+
+              <!-- Sample Queries Suggestions -->
+              <div class="suggestions-area">
+                <span class="suggestion-title">Sample Queries:</span>
+                <span class="suggestion-tag" data-query="Who introduced the concept of Retrieval-Augmented Generation (RAG)?">Who introduced RAG?</span>
+                <span class="suggestion-tag" data-query="What is the primary drawback of fixed-size chunking?">Fixed-size drawback?</span>
+                <span class="suggestion-tag" data-query="What model is used in second-pass retrieval to re-evaluate retrieved documents?">Reranking model?</span>
+                <span class="suggestion-tag" data-query="Explain the mechanism of Hierarchical Chunking (Parent-Child) retrieval.">Hierarchical mechanism?</span>
+              </div>
+
+              <!-- Search Results Columns -->
+              <div class="search-results-grid" id="search-results-grid" style="display: none;">
+                <!-- Column 1: Pre-Rerank -->
+                <div class="results-column">
+                  <div class="column-header">
+                    <h3><span class="bullet red"></span> 1st-Pass Retrieval (Embeddings Only)</h3>
+                    <span class="col-subtitle">Sorted by Cosine Similarity (Top 3)</span>
+                  </div>
+                  <div class="results-list" id="results-pre-rerank"></div>
+                </div>
+
+                <!-- Column 2: Post-Rerank -->
+                <div class="results-column">
+                  <div class="column-header">
+                    <h3><span class="bullet green"></span> 2nd-Pass Retrieval (Cohere Rerank)</h3>
+                    <span class="col-subtitle">Re-evaluated Top 5 down to Top 3</span>
+                  </div>
+                  <div class="results-list" id="results-post-rerank"></div>
+                </div>
+              </div>
+
+              <!-- Search Empty State -->
+              <div class="search-empty-state" id="search-empty-state">
+                <i data-lucide="terminal" class="large-icon"></i>
+                <h3>Enter search query</h3>
+                <p>Submit a query above to see first-pass vector matches vs. Cohere reranking in real time.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 3: Evaluation Dashboard -->
+          <div class="tab-pane" id="tab-evaluator">
+            <div class="glass-card flex-column">
+              <div class="pane-header-actions">
+                <div>
+                  <h2>Retrieval Quality Evaluation Suite</h2>
+                  <p>Comprehensive comparative results of all 4 chunking strategies across 10 queries</p>
+                </div>
+                <div>
+                  <button class="btn btn-secondary" id="btn-re-run-eval">
+                    <i data-lucide="refresh-cw"></i> Force Re-run API Eval
+                  </button>
+                </div>
+              </div>
+
+              <!-- Evaluation Loader -->
+              <div class="eval-loader" id="eval-loader" style="display: none;">
+                <div class="spinner"></div>
+                <h3>Running API Evaluation...</h3>
+                <p>This runs 10 evaluation queries across all 4 chunking strategies. Spaced with delays to respect Cohere API rate limits. (Est. duration: 4 mins)</p>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" id="eval-progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="eval-log" id="eval-log">Starting evaluation...</div>
+              </div>
+
+              <div class="eval-dashboard-content" id="eval-dashboard-content">
+                <!-- KPI Summary cards -->
+                <div class="kpi-grid">
+                  <div class="kpi-card">
+                    <div class="kpi-header">
+                      <span>Baseline Hit Rate @ 3</span>
+                      <i data-lucide="trending-up" class="color-blue"></i>
+                    </div>
+                    <div class="kpi-val" id="best-hit-pre">-</div>
+                    <div class="kpi-sub" id="best-hit-pre-strat">-</div>
+                  </div>
+                  <div class="kpi-card">
+                    <div class="kpi-header">
+                      <span>Post-Rerank Hit Rate @ 3</span>
+                      <i data-lucide="award" class="color-green"></i>
+                    </div>
+                    <div class="kpi-val" id="best-hit-post">-</div>
+                    <div class="kpi-sub" id="best-hit-post-strat">-</div>
+                  </div>
+                  <div class="kpi-card">
+                    <div class="kpi-header">
+                      <span>Max MRR @ 3 (Rerank)</span>
+                      <i data-lucide="zap" class="color-yellow"></i>
+                    </div>
+                    <div class="kpi-val" id="best-mrr">-</div>
+                    <div class="kpi-sub" id="best-mrr-strat">-</div>
+                  </div>
+                </div>
+
+                <!-- Custom Bar Charts -->
+                <div class="charts-row">
+                  <!-- Chart 1: Hit Rate comparison -->
+                  <div class="chart-card">
+                    <h3>Hit Rate @ 3 Comparison</h3>
+                    <p class="chart-subtitle">Before Rerank (Blue) vs. After Rerank (Green) - Higher is better</p>
+                    <div class="custom-chart" id="chart-hit-rate">
+                      <!-- Dynamically rendered bars -->
+                    </div>
+                  </div>
+
+                  <!-- Chart 2: MRR Comparison -->
+                  <div class="chart-card">
+                    <h3>Mean Reciprocal Rank (MRR) Comparison</h3>
+                    <p class="chart-subtitle">Before Rerank (Blue) vs. After Rerank (Green) - Higher is better</p>
+                    <div class="custom-chart" id="chart-mrr">
+                      <!-- Dynamically rendered bars -->
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Detailed Table -->
+                <div class="detail-table-card">
+                  <h3>Strategy Metrics Summary</h3>
+                  <div class="table-wrapper">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Strategy</th>
+                          <th>Chunks</th>
+                          <th>Avg Words</th>
+                          <th>Hit@1 (Embed)</th>
+                          <th>Hit@1 (Rerank)</th>
+                          <th>Hit@3 (Embed)</th>
+                          <th>Hit@3 (Rerank)</th>
+                          <th>MRR@3 (Embed)</th>
+                          <th>MRR@3 (Rerank)</th>
+                          <th>Latency</th>
+                        </tr>
+                      </thead>
+                      <tbody id="eval-table-body">
+                        <!-- Dynamic content -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <!-- Report Download Link -->
+                <div class="report-box">
+                  <div class="report-box-icon"><i data-lucide="file-check"></i></div>
+                  <div>
+                    <h4>Comparison Report Generated</h4>
+                    <p>A full comprehensive report has been saved to <code>chunking_comparison_report.md</code> in the project workspace root.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- View Document Modal -->
+  <div class="modal-overlay" id="modal-view-doc" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Ingested Testing Document</h2>
+        <button class="modal-close" id="modal-close-doc"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <pre id="modal-doc-content" class="raw-doc-pre"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Logic JS -->
+  <script src="app.js"></script>
+</body>
+</html>

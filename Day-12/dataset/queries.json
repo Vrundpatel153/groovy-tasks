@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "query": "Who introduced the concept of Retrieval-Augmented Generation (RAG)?",
+    "groundTruth": "Patrick Lewis and colleagues"
+  },
+  {
+    "id": 2,
+    "query": "What was the name of the paper that first introduced RAG?",
+    "groundTruth": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"
+  },
+  {
+    "id": 3,
+    "query": "What are the three distinct phases of classic RAG architecture?",
+    "groundTruth": "ingestion, retrieval, and generation"
+  },
+  {
+    "id": 4,
+    "query": "Name four common vector databases used in production RAG systems.",
+    "groundTruth": "ChromaDB, Pinecone, Milvus, and Qdrant"
+  },
+  {
+    "id": 5,
+    "query": "What is the primary drawback of fixed-size chunking?",
+    "groundTruth": "cuts off sentences in the middle of a thought, breaking semantic continuity"
+  },
+  {
+    "id": 6,
+    "query": "How does semantic chunking decide where to create a split boundary?",
+    "groundTruth": "similarity drops below a specified threshold"
+  },
+  {
+    "id": 7,
+    "query": "Explain the mechanism of Hierarchical Chunking (Parent-Child) retrieval.",
+    "groundTruth": "searches and matches against the smaller child chunks"
+  },
+  {
+    "id": 8,
+    "query": "What model is used in second-pass retrieval to re-evaluate retrieved documents?",
+    "groundTruth": "cross-encoder model"
+  },
+  {
+    "id": 9,
+    "query": "How does a cross-encoder model compute query-document interactions compared to a bi-encoder?",
+    "groundTruth": "processes the query and each document chunk together"
+  },
+  {
+    "id": 10,
+    "query": "What metric measures the percentage of queries where the correct chunk is in the top K?",
+    "groundTruth": "Hit Rate @ K measures the percentage"
+  }
+]

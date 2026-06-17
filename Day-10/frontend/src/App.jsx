@@ -13,8 +13,40 @@ import {
   Loader,
   Clock,
   Book,
-  Maximize2
+  Settings
 } from "lucide-react";
+import * as pdfjsLib from "pdfjs-dist";
+import { 
+  saveDocument, 
+  getDocuments, 
+  getDocumentText, 
+  deleteDocumentFromDB 
+} from "./db";
+
+// Set worker src using local node_modules via Vite's dynamic URL import
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
+
+const extractTextFromPDF = async (file) => {
+  const arrayBuffer = await file.arrayBuffer();
+  const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+  const pdf = await loadingTask.promise;
+  let fullText = "";
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items.map((item) => item.str || "").join(" ");
+    fullText += pageText + "\n";
+  }
+
+  return {
+    text: fullText.trim(),
+    numPages: pdf.numPages
+  };
+};
 
 export default function App() {
   const [documents, setDocuments] = useState([]);
@@ -28,11 +60,16 @@ export default function App() {
   const [sidebarSearch, setSidebarSearch] = useState("");
   const [docSearch, setDocSearch] = useState("");
   const [uploadError, setUploadError] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState("");
 
   const fileInputRef = useRef(null);
   const chatEndRef = useRef(null);
 
-  const API_BASE = "http://localhost:5000/api";
+  // Helper to retrieve API key
+  const getApiKey = () => {
+    return localStorage.getItem("notes-groq-api-key") || import.meta.env.VITE_GROQ_API_KEY || "";
+  };
 
   // Load documents on mount
   useEffect(() => {
@@ -57,6 +94,11 @@ export default function App() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chats, isChatting]);
 
+  // Load API Key to input when opening settings
+  useEffect(() => {
+    setApiKeyInput(localStorage.getItem("notes-groq-api-key") || "");
+  }, [showSettings]);
+
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
@@ -66,13 +108,11 @@ export default function App() {
 
   const fetchDocuments = async () => {
     try {
-      const res = await fetch(`${API_BASE}/documents`);
-      if (res.ok) {
-        const data = await res.json();
-        setDocuments(data);
-        if (data.length > 0 && !activeDocId) {
-          setActiveDocId(data[0].id);
-        }
+      const docs = await getDocuments();
+      docs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+      setDocuments(docs);
+      if (docs.length > 0 && !activeDocId) {
+        setActiveDocId(docs[0].id);
       }
     } catch (e) {
       console.error("Failed to fetch documents", e);
@@ -81,11 +121,8 @@ export default function App() {
 
   const fetchDocText = async (id) => {
     try {
-      const res = await fetch(`${API_BASE}/documents/${id}`);
-      if (res.ok) {
-        const data = await res.json();
-        setActiveDocText(data.text);
-      }
+      const text = await getDocumentText(id);
+      setActiveDocText(text);
     } catch (e) {
       console.error("Failed to fetch doc text", e);
     }
@@ -103,26 +140,37 @@ export default function App() {
     setUploadError(null);
     setIsUploading(true);
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const res = await fetch(`${API_BASE}/upload`, {
-        method: "POST",
-        body: formData,
-      });
+      const parsed = await extractTextFromPDF(file);
+      const text = parsed.text;
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Failed to upload file.");
+      if (!text) {
+        throw new Error("Unable to extract text from the PDF. It may be scanned or empty.");
       }
 
-      const data = await res.json();
-      setDocuments(prev => [data.document, ...prev]);
-      setActiveDocId(data.document.id);
+      const docId = `doc_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+      const wordCount = text.split(/\s+/).filter(Boolean).length;
+      const readingTime = Math.ceil(wordCount / 200);
+
+      const documentData = {
+        id: docId,
+        name: file.name,
+        size: file.size,
+        text: text,
+        wordCount,
+        readingTime,
+        pages: parsed.numPages,
+        uploadedAt: new Date().toISOString()
+      };
+
+      await saveDocument(documentData);
+
+      setDocuments(prev => [documentData, ...prev]);
+      setActiveDocId(docId);
+      setActiveDocText(text);
     } catch (e) {
       console.error("Upload failed", e);
-      setUploadError(e.message);
+      setUploadError(e.message || "Failed to parse PDF file.");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -134,21 +182,16 @@ export default function App() {
     if (!confirm("Are you sure you want to delete this document?")) return;
 
     try {
-      const res = await fetch(`${API_BASE}/documents/${id}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        setDocuments(prev => prev.filter(doc => doc.id !== id));
-        if (activeDocId === id) {
-          const remaining = documents.filter(doc => doc.id !== id);
-          setActiveDocId(remaining.length > 0 ? remaining[0].id : null);
-        }
-        // Delete chat history for this doc
-        const newChats = { ...chats };
-        delete newChats[id];
-        setChats(newChats);
+      await deleteDocumentFromDB(id);
+      setDocuments(prev => prev.filter(doc => doc.id !== id));
+      if (activeDocId === id) {
+        const remaining = documents.filter(doc => doc.id !== id);
+        setActiveDocId(remaining.length > 0 ? remaining[0].id : null);
       }
+      // Delete chat history for this doc
+      const newChats = { ...chats };
+      delete newChats[id];
+      setChats(newChats);
     } catch (err) {
       console.error("Delete failed", err);
     }
@@ -157,6 +200,13 @@ export default function App() {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!currentInput.trim() || !activeDocId || isChatting) return;
+
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      setUploadError("Please set your Groq API Key in settings first.");
+      setShowSettings(true);
+      return;
+    }
 
     const userMessageText = currentInput.trim();
     setCurrentInput("");
@@ -180,18 +230,43 @@ export default function App() {
     }));
 
     try {
-      const response = await fetch(`${API_BASE}/chat`, {
+      const activeDoc = documents.find(d => d.id === activeDocId);
+      const systemPrompt = `You are a helpful and intelligent notes assistant. You have been given access to the notes/document titled "${activeDoc.name}".
+Below is the full text content of the document. Use this context to answer the user's questions as accurately and comprehensively as possible.
+If the answer is not mentioned or cannot be inferred from the document text, mention that, but offer any general knowledge helper context if relevant while being clear it's outside the notes.
+
+--- START DOCUMENT CONTENT ---
+${activeDocText}
+--- END DOCUMENT CONTENT ---
+
+Always refer to the notes provided where appropriate.`;
+
+      const apiMessages = [
+        { role: "system", content: systemPrompt },
+        ...(currentHistory || []).map(msg => ({
+          role: msg.sender === "user" ? "user" : "assistant",
+          content: msg.text
+        })),
+        { role: "user", content: userMessageText }
+      ];
+
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
         body: JSON.stringify({
-          documentId: activeDocId,
-          message: userMessageText,
-          history: currentHistory,
+          model: "llama-3.3-70b-versatile",
+          messages: apiMessages,
+          temperature: 0.3,
+          stream: true,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("API request failed");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `API request failed with status ${response.status}`);
       }
 
       const reader = response.body.getReader();
@@ -203,17 +278,19 @@ export default function App() {
         if (done) break;
 
         const chunk = decoder.decode(value);
-        const lines = chunk.split("\n\n");
+        const lines = chunk.split("\n");
 
         for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const dataStr = line.slice(6).trim();
-            if (dataStr === "[DONE]") continue;
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+          if (trimmed === "data: [DONE]") continue;
 
+          if (trimmed.startsWith("data: ")) {
             try {
-              const data = JSON.parse(dataStr);
-              if (data.text) {
-                streamedResponse += data.text;
+              const data = JSON.parse(trimmed.slice(6));
+              const token = data.choices?.[0]?.delta?.content || "";
+              if (token) {
+                streamedResponse += token;
                 // Update assistant's last message stream in real-time
                 setChats(prev => {
                   const docHistory = [...(prev[activeDocId] || [])];
@@ -225,11 +302,9 @@ export default function App() {
                   }
                   return { ...prev, [activeDocId]: docHistory };
                 });
-              } else if (data.error) {
-                throw new Error(data.error);
               }
             } catch (err) {
-              console.error("Error parsing stream line", err);
+              console.error("Error parsing stream line", trimmed, err);
             }
           }
         }
@@ -241,7 +316,7 @@ export default function App() {
         if (docHistory.length > 0) {
           docHistory[docHistory.length - 1] = {
             sender: "assistant",
-            text: `⚠️ Error: ${error.message || "Failed to communicate with AI server. Please make sure the Groq API key is valid."}`
+            text: `⚠️ Error: ${error.message || "Failed to communicate with Groq API. Please make sure the API key is valid."}`
           };
         }
         return { ...prev, [activeDocId]: docHistory };
@@ -249,6 +324,12 @@ export default function App() {
     } finally {
       setIsChatting(false);
     }
+  };
+
+  const saveApiKey = (e) => {
+    e.preventDefault();
+    localStorage.setItem("notes-groq-api-key", apiKeyInput.trim());
+    setShowSettings(false);
   };
 
   // Helper to format file size
@@ -296,9 +377,14 @@ export default function App() {
             </div>
             <span className="card-title" style={{ fontWeight: "700" }}>AskMyNotes</span>
           </div>
-          <button onClick={toggleTheme} className="btn btn-secondary btn-icon" title="Toggle Theme">
-            {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
-          </button>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button onClick={() => setShowSettings(true)} className="btn btn-secondary btn-icon" title="API Settings">
+              <Settings size={16} />
+            </button>
+            <button onClick={toggleTheme} className="btn btn-secondary btn-icon" title="Toggle Theme">
+              {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+            </button>
+          </div>
         </div>
 
         {/* Sidebar Search */}
@@ -551,6 +637,61 @@ export default function App() {
           </div>
         </section>
       </main>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: "var(--bg-card)",
+            padding: "30px",
+            borderRadius: "var(--radius-md)",
+            border: "1px solid var(--border-color)",
+            width: "400px",
+            maxWidth: "90%",
+            boxShadow: "var(--shadow-lg)"
+          }}>
+            <h3 style={{ fontFamily: "var(--font-serif)", fontSize: "1.25rem", marginBottom: "16px", color: "var(--text-main)" }}>
+              Groq API Settings
+            </h3>
+            <form onSubmit={saveApiKey}>
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "8px" }}>
+                  Groq API Key (Stored locally in your browser)
+                </label>
+                <input 
+                  type="password" 
+                  placeholder={import.meta.env.VITE_GROQ_API_KEY ? "Using default key (optional override)" : "gsk_..."}
+                  value={apiKeyInput}
+                  onChange={(e) => setApiKeyInput(e.target.value)}
+                  className="text-input"
+                />
+                <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "6px" }}>
+                  If left blank, the application will use the default system key.
+                </p>
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                <button type="button" onClick={() => setShowSettings(false)} className="btn btn-secondary">
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Save Key
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
