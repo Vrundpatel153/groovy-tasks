@@ -1,6 +1,8 @@
 # Day 15: Meeting Summarizer Agent
 
-![Meeting Summary Demonstration](file:///c:/Users/vrund/OneDrive/Desktop/Groovy-Tasks/Day-15/meeting%20summary.mp4)
+[📺 Watch the Demonstration Video](./meeting%20summary.mp4)
+
+![Meeting Summary Demonstration](./meeting%20summary.mp4)
 A Node.js and React application that acts as an autonomous meeting summarization and dispatch agent. Powered by the Llama-3.3-70b-versatile model on Groq, the agent generates concise summaries, extracts structured action items with assigned owners and deadlines, sends them to a Slack channel via webhook, and persists records in a local JSON database.
 ![alt text](image-1.png)
 ![alt text](image.png)
