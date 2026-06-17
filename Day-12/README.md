@@ -1,5 +1,7 @@
 # Day 12: RAG Chunking Strategies & Cohere Reranker Evaluation Sandbox
-![alt text](image.png)
+
+![RAG Chunking Sandbox Demo](RAG_Chunking_sandbox.mp4)
+
 This project is an interactive sandbox and evaluation suite designed to test, visualize, and measure the performance of **four distinct text chunking strategies** for Retrieval-Augmented Generation (RAG) systems. It also explores the impact of **second-pass retrieval** using a cross-encoder model (**Cohere Rerank**).
 
 ---
