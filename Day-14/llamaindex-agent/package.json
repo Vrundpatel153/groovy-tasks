@@ -1,0 +1,9 @@
+{
+  "name": "llamaindex-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "llamaindex": "^0.8.21",
+    "zod": "^3.23.8"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "langchain-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@langchain/core": "^0.2.14",
+    "@langchain/groq": "^0.1.2",
+    "@langchain/openai": "^0.1.0",
+    "langchain": "^0.2.7",
+    "openai": "^4.52.0",
+    "zod": "^3.23.8"
+  }
+}
