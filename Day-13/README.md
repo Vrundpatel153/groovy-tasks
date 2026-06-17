@@ -1,5 +1,6 @@
 # Day 13: Tool-Using AI Agent with React UI
-<video src="multi tool agent.mp4" width="100%" controls></video>
+
+<video controls src="multi tool agent.mp4" title="Title"></video>
 
 A tool-using AI agent with a web interface. The backend uses the **Groq API** (via OpenAI SDK and `llama-3.3-70b-versatile` model) to run an agentic tool-calling loop, and serves a modern, responsive React frontend.
 
