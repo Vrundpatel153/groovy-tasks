@@ -1,0 +1,115 @@
+{
+  "meetings": [
+    {
+      "id": "mqhoe53wljeap",
+      "timestamp": "2026-06-17T06:14:06.428Z",
+      "transcript": "Dave: Let's release the code by Friday. Sarah will write the docs by tomorrow. Mark: I'll test it.",
+      "summary": "The meeting discussed the upcoming release of the code, with a target release date set for Friday. Sarah agreed to complete the documentation by tomorrow to support the release. Mark volunteered to conduct testing to ensure the code is ready for release. Overall, the team is on track to meet the Friday deadline with all necessary tasks assigned and accounted for.",
+      "actionItems": [
+        {
+          "task": "release the code",
+          "owner": "unspecified",
+          "deadline": "Friday"
+        },
+        {
+          "task": "write the docs",
+          "owner": "Sarah",
+          "deadline": "tomorrow"
+        },
+        {
+          "task": "test the code",
+          "owner": "Mark",
+          "deadline": "unspecified"
+        }
+      ],
+      "slackSent": true
+    },
+    {
+      "id": "mqhoe9nga6ynq",
+      "timestamp": "2026-06-17T06:14:12.316Z",
+      "transcript": "Dave: Let's release the code by Friday. Sarah will write the docs by tomorrow. Mark: I'll test it.",
+      "summary": "The meeting discussed the upcoming release of the code, with a target deadline of this Friday. Sarah agreed to complete the documentation by tomorrow to support the release. Mark took on the responsibility of testing the code to ensure its quality and readiness for release. The team appeared to be on track to meet the Friday deadline, with all tasks and responsibilities clearly assigned. Overall, the meeting resulted in a clear plan and timeline for the successful release of the code.",
+      "actionItems": [
+        {
+          "task": "release the code",
+          "owner": "unspecified",
+          "deadline": "Friday"
+        },
+        {
+          "task": "write the docs",
+          "owner": "Sarah",
+          "deadline": "tomorrow"
+        },
+        {
+          "task": "test the code",
+          "owner": "Mark",
+          "deadline": "unspecified"
+        }
+      ],
+      "slackSent": true
+    },
+    {
+      "id": "mqhonju64og8f",
+      "timestamp": "2026-06-17T06:21:25.422Z",
+      "transcript": "Sarah: Thanks everyone for joining. Let's align on the Q3 product launch. Dave, how is the development of the primary auth dashboard going?\nDave: Development is mostly complete, but we have some edge cases to resolve. I will finish debugging the MFA flow by Friday.\nSarah: Perfect. Mark, what about the landing page design? We need it ready for review.\nMark: The initial mockups are done. I'll share the final landing page designs on Figma by Tuesday, June 23rd.\nSarah: Great. I will prepare the marketing copy and launch email sequence by next Monday.\nDave: Will we need a new database migration for this?\nSarah: Yes, let's have Dave write the migration script by next Wednesday so we don't block the release.\nDave: Understood, I'll take care of that.\nSarah: Sounds like a plan. Let's sync again next Thursday. Thanks!",
+      "summary": "The meeting focused on aligning the team for the Q3 product launch, with key discussions on the development of the primary auth dashboard and the landing page design. Dave confirmed that the dashboard development is mostly complete, with debugging to be finished by Friday, and will also create a database migration script by next Wednesday. Mark will share the final landing page designs on Figma by June 23rd, while Sarah will prepare the marketing copy and launch email sequence by next Monday. The team will reconvene next Thursday to review progress and finalize the launch plan. Overall, the meeting resulted in a clear plan and assigned tasks to ensure a successful product launch.",
+      "actionItems": [
+        {
+          "task": "Finish debugging the MFA flow",
+          "owner": "Dave",
+          "deadline": "Friday"
+        },
+        {
+          "task": "Share the final landing page designs on Figma",
+          "owner": "Mark",
+          "deadline": "Tuesday, June 23rd"
+        },
+        {
+          "task": "Prepare the marketing copy and launch email sequence",
+          "owner": "Sarah",
+          "deadline": "next Monday"
+        },
+        {
+          "task": "Write the migration script",
+          "owner": "Dave",
+          "deadline": "next Wednesday"
+        }
+      ],
+      "slackSent": true
+    },
+    {
+      "id": "mqhor5bturtqo",
+      "timestamp": "2026-06-17T06:24:13.241Z",
+      "transcript": "Meeting: Weekly Product Sync\nDate: June 17, 2026\nAttendees: Priya, Daniel, Aisha, Marcus\n\nPriya: Let's get started. First up, the onboarding flow redesign. Daniel, where are we?\n\nDaniel: The new wireframes are done. I'll share them in Figma by Thursday. Aisha, can you review them before the next sync?\n\nAisha: Sure, I'll get feedback to Daniel by Friday.\n\nPriya: Great. Next, the API rate-limiting bug from last sprint. Marcus, any update?\n\nMarcus: I found the root cause, it's in the retry logic. I'll push a fix by tomorrow and deploy it Wednesday.\n\nPriya: Perfect. Last item, we need someone to prepare slides for the stakeholder demo next Monday.\n\nAisha: I can take that. I'll have a draft ready by Sunday for review.\n\nPriya: Awesome, thanks everyone. Same time next week.\n",
+      "summary": "The Weekly Product Sync meeting was held on June 17, 2026, with attendees Priya, Daniel, Aisha, and Marcus. The team discussed the onboarding flow redesign, with Daniel sharing that new wireframes will be available in Figma by Thursday and Aisha agreeing to provide feedback by Friday. Marcus provided an update on the API rate-limiting bug, stating that he has found the root cause and will deploy a fix by Wednesday. The team also assigned tasks for the stakeholder demo, with Aisha volunteering to prepare slides with a draft ready by Sunday. Overall, the meeting resulted in clear action items and deadlines for the team to move forward on their product initiatives.",
+      "actionItems": [
+        {
+          "task": "Share new wireframes in Figma",
+          "owner": "Daniel",
+          "deadline": "Thursday"
+        },
+        {
+          "task": "Review wireframes and provide feedback",
+          "owner": "Aisha",
+          "deadline": "Friday"
+        },
+        {
+          "task": "Push a fix for the API rate-limiting bug",
+          "owner": "Marcus",
+          "deadline": "tomorrow"
+        },
+        {
+          "task": "Deploy the fix for the API rate-limiting bug",
+          "owner": "Marcus",
+          "deadline": "Wednesday"
+        },
+        {
+          "task": "Prepare slides for the stakeholder demo",
+          "owner": "Aisha",
+          "deadline": "Sunday"
+        }
+      ],
+      "slackSent": true
+    }
+  ]
+}
