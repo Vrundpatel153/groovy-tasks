@@ -2,7 +2,7 @@
 https://elaborate-tartufo-716253.netlify.app/
 
 A minimalist, journal-style web application that allows users to upload PDF notes and ask natural language questions about them. The app leverages Groq's high-speed inference (using `llama-3.3-70b-versatile` with a large 128k token context window) to answer questions directly from the note text, without requiring a vector database.
-<video controls src="20260616-1050-04.9095426.mp4" title="Title"></video>
+<video src="https://github.com/Vrundpatel153/groovy-tasks/raw/main/Day-10/20260616-1050-04.9095426.mp4" controls width="100%"></video>
 ## Architecture
 
 - **Frontend**: React (Vite setup) featuring:

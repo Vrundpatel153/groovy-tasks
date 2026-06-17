@@ -1,6 +1,6 @@
 # Ask My Notes v2 - RAG & ChromaDB Web Application
 
-<video controls src="20260616-1129-19.2181151.mp4" title="Title"></video>
+<video src="https://github.com/Vrundpatel153/groovy-tasks/raw/main/Day-11/20260616-1129-19.2181151.mp4" controls width="100%"></video>
 
 An advanced document Q&A web application featuring Retrieval-Augmented Generation (RAG) using a local ChromaDB vector database, token cost analytics, and interactive source citations.
 
