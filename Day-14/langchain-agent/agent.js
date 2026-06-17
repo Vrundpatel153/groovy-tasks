@@ -1,8 +1,14 @@
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatGroq } from "@langchain/groq";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { createToolCallingAgent, AgentExecutor } from "langchain/agents";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { 
+  getShortTermMemory, 
+  addShortTermMemory, 
+  getLongTermMemory, 
+  updateLongTermMemory 
+} from "../utils/memoryStore.js";
 
 // Helper calculator function
 function runCalculator(operation, a, b) {
@@ -54,12 +60,9 @@ async function runWebSearch(query) {
 export async function runAgent(message) {
   const usedTools = [];
 
-  const model = new ChatOpenAI({
+  const model = new ChatGroq({
     apiKey: process.env.GROQ_API_KEY,
-    configuration: {
-      baseURL: "https://api.groq.com/openai/v1",
-    },
-    model: "llama-3.3-70b-versatile",
+    model: "llama-3.1-8b-instant",
     temperature: 0,
   });
 
@@ -93,11 +96,25 @@ export async function runAgent(message) {
     }
   );
 
-  const prompt = ChatPromptTemplate.fromMessages([
-    ["system", "You are an intelligent, helpful agent with access to tools (calculator, web_search). Use tools whenever a user asks to calculate something or search the web for current events/information. Summarize the final results clearly."],
-    ["human", "{input}"],
-    ["placeholder", "{agent_scratchpad}"],
-  ]);
+  const existingFacts = getLongTermMemory('langchain');
+  const factsContext = existingFacts.length > 0
+    ? `\nLong-term memory (known facts about the user):\n${existingFacts.map(f => `- ${f}`).join('\n')}`
+    : '';
+
+  const messages = [
+    ["system", `You are a helpful assistant with access to two tools: calculator and web_search. Call calculator for math operations, and call web_search for search queries. IMPORTANT: Do not call a tool unless it is absolutely necessary. If the user's question can be answered using the conversation history (e.g., they are asking about what was said earlier, what city was mentioned, etc.), you MUST answer it directly using that context. Do NOT call any tool in this case. Just reply with conversational text.${factsContext}`]
+  ];
+
+  // Load and append short-term memory
+  const history = getShortTermMemory('langchain');
+  history.forEach(msg => {
+    messages.push([msg.role === 'user' ? 'human' : 'ai', msg.content]);
+  });
+
+  messages.push(["human", "{input}"]);
+  messages.push(["placeholder", "{agent_scratchpad}"]);
+
+  const prompt = ChatPromptTemplate.fromMessages(messages);
 
   const agent = await createToolCallingAgent({
     llm: model,
@@ -111,9 +128,19 @@ export async function runAgent(message) {
   });
 
   const response = await executor.invoke({ input: message });
+  const answer = response.output || '';
+
+  // Update short-term memory
+  addShortTermMemory('langchain', 'user', message);
+  addShortTermMemory('langchain', 'assistant', answer);
+
+  // Update long-term memory in background (non-blocking)
+  updateLongTermMemory('langchain', message, answer).catch(err => 
+    console.error('Long term memory extract error:', err)
+  );
 
   return {
-    answer: response.output || '',
+    answer,
     toolUsed: usedTools.length > 0 ? usedTools[0] : 'none'
   };
 }

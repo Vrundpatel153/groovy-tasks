@@ -1,4 +1,10 @@
 import OpenAI from "openai";
+import { 
+  getShortTermMemory, 
+  addShortTermMemory, 
+  getLongTermMemory, 
+  updateLongTermMemory 
+} from "../utils/memoryStore.js";
 
 // Helper calculator function
 function runCalculator(operation, a, b) {
@@ -73,7 +79,7 @@ export async function runAgent(message) {
     {
       type: 'function',
       function: {
-        name: 'search',
+        name: 'web_search',
         description: 'Search the web using Tavily for up-to-date information, news, or general knowledge.',
         parameters: {
           type: 'object',
@@ -86,13 +92,24 @@ export async function runAgent(message) {
     }
   ];
 
+  const existingFacts = getLongTermMemory('pure-sdk');
+  const factsContext = existingFacts.length > 0
+    ? `\nLong-term memory (known facts about the user):\n${existingFacts.map(f => `- ${f}`).join('\n')}`
+    : '';
+
   const messages = [
     {
       role: 'system',
-      content: 'You are an intelligent, helpful agent with access to tools (calculator, search). Do NOT wrap function calls in XML tags like <function=...> or output custom XML formatting. Instead, invoke the tools natively via the API. Use tools whenever a user asks to calculate something or search the web for current events/information. Summarize the final results clearly.'
-    },
-    { role: 'user', content: message }
+      content: `You are a helpful assistant with access to two tools: calculator and web_search. Call calculator for math operations, and call web_search for search queries. IMPORTANT: Do not call a tool unless it is absolutely necessary. If the user's question can be answered using the conversation history (e.g., they are asking about what was said earlier, what city was mentioned, etc.), you MUST answer it directly using that context. Do NOT call any tool in this case. Just reply with conversational text.${factsContext}`
+    }
   ];
+
+  // Append short-term memory (recent chat history)
+  const history = getShortTermMemory('pure-sdk');
+  history.forEach(msg => messages.push(msg));
+
+  // Add the current user query
+  messages.push({ role: 'user', content: message });
 
   const usedTools = [];
   let loopCount = 0;
@@ -100,7 +117,7 @@ export async function runAgent(message) {
 
   while (loopCount < maxLoops) {
     const completion = await openai.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       messages: messages,
       tools: tools,
       tool_choice: 'auto'
@@ -119,7 +136,7 @@ export async function runAgent(message) {
 
         if (toolName === 'calculator') {
           toolResult = runCalculator(toolArgs.operation, toolArgs.a, toolArgs.b);
-        } else if (toolName === 'search') {
+        } else if (toolName === 'web_search') {
           toolResult = await runWebSearch(toolArgs.query);
         } else {
           toolResult = `Error: Tool '${toolName}' is not recognized.`;
@@ -134,8 +151,19 @@ export async function runAgent(message) {
       }
       loopCount++;
     } else {
+      const answer = responseMessage.content || '';
+      
+      // Update short-term memory
+      addShortTermMemory('pure-sdk', 'user', message);
+      addShortTermMemory('pure-sdk', 'assistant', answer);
+      
+      // Update long-term memory in background (non-blocking)
+      updateLongTermMemory('pure-sdk', message, answer).catch(err => 
+        console.error('Long term memory extract error:', err)
+      );
+
       return {
-        answer: responseMessage.content || '',
+        answer,
         toolUsed: usedTools.length > 0 ? usedTools[0] : 'none'
       };
     }

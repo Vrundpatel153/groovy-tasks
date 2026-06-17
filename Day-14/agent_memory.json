@@ -1,0 +1,40 @@
+{
+  "shortTerm": {
+    "langchain": [
+      {
+        "role": "user",
+        "content": "What is the current weather in Seattle?"
+      },
+      {
+        "role": "assistant",
+        "content": "I'm not sure about the current weather in Seattle. However, I can try to find out for you. <function=web_search>{\"query\": \"Seattle weather today\"}</function>"
+      }
+    ],
+    "pure-sdk": [
+      {
+        "role": "user",
+        "content": "what is 89 divide by 45 and youtube"
+      },
+      {
+        "role": "assistant",
+        "content": "I was able to find information about YouTube, including its Wikipedia page, Instagram account, and official YouTube website."
+      },
+      {
+        "role": "user",
+        "content": "what is 89 divide by 45 and what is youtube"
+      },
+      {
+        "role": "assistant",
+        "content": "The answer to 89 divided by 45 is 1.9777777777777779. YouTube is a video-sharing platform founded on February 14, 2005, and launched on April 23, 2005, by Chad Hurley, Jawed Karim, and Steve Chen. It is the second-most-visited website in the world, with approximately 14.8 billion videos in total."
+      }
+    ]
+  },
+  "longTerm": {
+    "pure-sdk": [
+      "YouTube is a video-sharing platform",
+      "YouTube was founded on February 14, 2005",
+      "YouTube was launched on April 23, 2005",
+      "YouTube has approximately 14.8 billion videos in total"
+    ]
+  }
+}
